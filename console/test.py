@@ -1,7 +1,5 @@
-def fact(n):
-    if n == 1:
-        return 1
-    return n * fact(n - 1)
+import sys
+import preInit
 
+print(sys.path)
 
-print(fact(5))
