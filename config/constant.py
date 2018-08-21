@@ -18,3 +18,6 @@ MODULE_PATH = ROOT_PATH + '/module'
 
 # 临时文件夹
 RUNTIME_PATH = ROOT_PATH + '/runtime'
+
+# 休眠时间(秒)
+SLEEP_DELAY = 3
