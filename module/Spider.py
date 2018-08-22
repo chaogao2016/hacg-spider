@@ -66,8 +66,6 @@ class Spider(object):
     def animation_action(self):
         pass
 
-
-    #合并测试
     # 程序启动
     def run(self):
         while self.check_status() :
