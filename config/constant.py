@@ -5,7 +5,7 @@ import os,sys
 __author__ = 'gaochao'
 
 # 网站地址
-SITE_URL = 'https://www.llss.li/wp/category/all/anime/'
+SITE_URL = 'https://www.llss.li'
 
 # 根目录路径
 ROOT_PATH = sys.path[0]
