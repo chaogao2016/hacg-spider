@@ -2,8 +2,10 @@
 # -*- coding: utf-8 -*-
 import time
 import regex as re
+from selenium import webdriver
 import requests
 import config.constant as constant
+
 
 __author__ = 'gaochao'
 
@@ -107,13 +109,39 @@ class Spider(object):
 
     # 程序启动
     def run(self):
-        while self.check_status() :
-            self.home_action()
+        # from selenium import webdriver
+        # from selenium.webdriver.chrome.options import Options
 
-            self.animation_action()
+        # options = Options()
+        # options.add_argument("--headless")  # Runs Chrome in headless mode.
+        # # options.add_argument('--no-sandbox')  # # Bypass OS security model
+        # options.add_argument('start-maximized')
+        # options.add_argument('disable-infobars')
+        # options.add_argument("--disable-extensions")
+        #
+        # options = webdriver.ChromeOptions()
+        # options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        # chrome_driver_binary = "/usr/local/bin/chromedriver"
+        # driver = webdriver.Chrome(chrome_driver_binary, chrome_options=options)
+        # driver = webdriver.Chrome( executable_path='/data/apps/chromedriver/chromedriver',chrome_options=options)
+        # driver.get("http://baidu.com")
+        # title = driver.title
+        # print(title)
 
-            print('大循环终止三秒')
-            time.sleep(constant.SLEEP_DELAY)
+        from selenium import webdriver
+
+        options = webdriver.ChromeOptions()
+        options.add_argument("--headless")
+        chrome_driver_binary = "/usr/local/bin/chromedriver"
+        driver = webdriver.Chrome(chrome_options=options)
+
+        # while self.check_status() :
+        #     self.home_action()
+        #
+        #     self.animation_action()
+        #
+        #     print('大循环终止三秒')
+        #     time.sleep(constant.SLEEP_DELAY)
 
         print("程序终止")
         exit()
