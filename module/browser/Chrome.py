@@ -40,17 +40,11 @@ class Chrome(object):
     # 根据url获取动画页全部文档
     def get_animation_full_document(self,url):
         self.driver.get(url)
-        try:
-            self.driver.get(url)
-            full_document = self.driver.find_element_by_xpath('//*').get_attribute("outerHTML")
-            return full_document
-            # element = WebDriverWait(self.driver, 10).until(
-            #     Ec.presence_of_element_located((By.CSS_SELECTOR, ".wp-pagenavi"))
-            # )
-            # full_document = element.find_element_by_xpath('//*').get_attribute("outerHTML")
-            # return full_document
-        finally:
-            self.driver.quit()
+        print(url)
+        import time
+        time.sleep(2)
+        full_document = self.driver.find_element_by_xpath('//*').get_attribute("outerHTML")
+        return full_document
 
     # 关闭浏览器
     def close_browser(self):

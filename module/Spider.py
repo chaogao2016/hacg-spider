@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import time
 import regex as re
-import requests
 import config.constant as constant
 import module.browser.Chrome as Chrome
 from module.browser.Chrome import Chrome
@@ -72,34 +71,27 @@ class Spider(object):
         else:
             if self.animationPageSize == 0:
                 print("动画页第一次抓取，先初始化分页数据")
-                first_animation_url = self.animationUrl + 'page/' + str(self.curAnimationPage)
+                first_animation_url = self.animationUrl + '/page/' + str(self.curAnimationPage)
                 first_animation_page_content = Chrome.instance().get_animation_full_document(first_animation_url)
                 # 抓取动画页最后一页id
                 regex_last_page = re.compile("(?<=['\"]wp-pagenavi['\"][\s\S]*last.*page/)\d*(?=/?)")
                 result_last_page = regex_last_page.findall(first_animation_page_content)
                 print(result_last_page)
-                result_last_page = [88]
                 if len(result_last_page) < 1 or int(result_last_page[0]) <= 0 :
                     print("未抓到动画尾页，失败")
                     return -1
                 else:
                     print('共有' + str(result_last_page) + '页动画')
-                    self.animationPageSize = result_last_page[0]
+                    self.animationPageSize = int(result_last_page[0])
 
             # 遍历分页，抓取动画数据
             for page_id in range(1,self.animationPageSize + 1) :
                 print('开始第' + str(self.curAnimationPage) + '页动画页数据抓取')
-                current_animation_url = self.animationUrl + 'page/' + str(self.curAnimationPage)
+                current_animation_url = self.animationUrl + '/page/' + str(self.curAnimationPage)
                 animation_page_content = Chrome.instance().get_animation_full_document(current_animation_url)
                 # 抓取当前页面子链接正则
                 regex_sub_link = re.compile("(?<=article[\s\S]*entry-title.*=\").*(?=\" )")
                 result_sub_link = regex_sub_link.findall(animation_page_content)
-
-                print("===========")
-                f = open(constant.RUNTIME_PATH + '/test.log', 'w')
-                f.write(animation_page_content)
-                f.close()
-                print("============")
                 for sub_link in result_sub_link :
                     print(sub_link)
                 self.curAnimationPage += 1
