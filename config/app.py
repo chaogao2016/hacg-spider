@@ -8,5 +8,5 @@ IS_DEBUG = True
 # 日志路径
 LOG_PATH = 'runtime/log'
 
-# 存储驱动(1:文件 2:mysql)
-STORAGE_DRIVER = 1
+# 存储驱动(1:文件 2:mysql 3:文件+mysql)
+STORAGE_DRIVER = 2

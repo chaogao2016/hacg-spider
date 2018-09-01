@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import time
+import json
 import config.constant as constant
 import module.browser.Chrome as Chrome
 from module.browser.Chrome import Chrome
 from module.regex.Regex import Regex
+from module.storage.Storage import Storage
 
 __author__ = 'gaochao'
 
@@ -18,7 +20,7 @@ class Spider(object):
         # 文章页url
         self.comicUrl = ''
         # 当前爬到的动画页数
-        self.curAnimationPage = 1
+        self.curAnimationPage = 47
         # 动画总页数
         self.animationPageSize = 0
 
@@ -82,7 +84,8 @@ class Spider(object):
                     self.animationPageSize = int(result_last_page[0])
 
             # 遍历分页，抓取动画数据
-            for page_id in range(1,self.animationPageSize + 1) :
+            start_index = self.curAnimationPage
+            for page_id in range(start_index,self.animationPageSize + 1) :
                 print('开始第' + str(self.curAnimationPage) + '页动画页数据抓取')
                 current_animation_url = self.animationUrl + '/page/' + str(self.curAnimationPage)
                 animation_page_content = Chrome.instance().get_common_document(current_animation_url)
@@ -90,9 +93,18 @@ class Spider(object):
                 result_sub_link = Regex.animation_sub_link(animation_page_content)
                 # 遍历当前分页链接，访问并抓取具体内容
                 for sub_link in result_sub_link :
+                    print(sub_link)
+                    if sub_link.find('all/game') != -1:
+                        print('过滤掉游戏')
+                        print("==================================================")
+                        continue
                     animation_detail = Chrome.instance().get_common_document(sub_link)
                     # 抓取页面标题
                     result_title = Regex.animation_title(animation_detail)
+                    if result_title.find('预告') != -1 :
+                        print('过滤掉预告')
+                        print("==================================================")
+                        continue
                     print('标题：' + str(result_title))
                     # 抓取页面描述
                     result_desc = Regex.animation_desc(animation_detail)
@@ -101,9 +113,30 @@ class Spider(object):
                     result_image = Regex.animation_image(animation_detail)
                     print('图片：' + str(result_image))
                     # 抓取磁链
-                    result_magnet = Regex.animation_magnet(animation_detail)
-                    print('磁链：' + str(result_magnet))
+                    magnet_str = Regex.animation_magnet_str(animation_detail)
+                    # 熟肉
+                    cook_magnet = Regex.animation_cook_magnet(magnet_str)
+                    print('熟肉磁链：' + str(cook_magnet))
+                    # 生肉
+                    fresh_magnet = Regex.animation_fresh_magnet(magnet_str)
+                    print('生肉磁链：' + str(fresh_magnet))
+                    # 其他磁链
+                    other_magnet = Regex.animation_other_magnet(magnet_str)
+                    print('其他磁链：' + str(other_magnet))
+                    # 组装数据
+                    data_map = {
+                        "title" : result_title,
+                        "desc" : result_desc,
+                        "image" : json.dumps(result_image),
+                        "cook_magnet" : json.dumps(cook_magnet),
+                        "fresh_magnet": json.dumps(fresh_magnet),
+                        "other_magnet": json.dumps(other_magnet),
+                    }
 
+                    #存储数据
+                    Storage.save_base_info(data_map)
+
+                    print("==================================================")
                     time.sleep(1)
 
                 self.curAnimationPage += 1

@@ -35,7 +35,7 @@ class Regex(object):
     # 动画页抓取子页面链接
     @classmethod
     def animation_sub_link(cls,content):
-        regex_sub_link = re.compile("(?<=article[\s\S]*entry-title.*=\").*(?=\" )")
+        regex_sub_link = re.compile("(?<=article[\s\S]*entry-title.*=\").*(?=\".*rel)")
         result_sub_link = regex_sub_link.findall(content)
         return result_sub_link
 
@@ -44,14 +44,20 @@ class Regex(object):
     def animation_title(cls,content):
         regex_title = re.compile("(?<=h1.*entry-title.*>).*(?=</h1>)")
         result = regex_title.findall(content)
-        return result
+        if len(result) < 1:
+            return ''
+        else:
+            return result[0]
 
     # 动画页提取描述
     @classmethod
     def animation_desc(cls, content):
         regex_desc = re.compile("(?<=>)[^>]*(?=<span.*more-)")
         result = regex_desc.findall(content)
-        return result
+        if len(result) < 1:
+            return ''
+        else:
+            return result[0]
 
     # 动画页提取图片
     @classmethod
@@ -60,19 +66,37 @@ class Regex(object):
         result = regex_image.findall(content)
         return result
 
-    # 动画页提取磁链
+    # 动画页提取包含磁链的文本
     @classmethod
-    def animation_magnet(cls, content):
-        # 先提取一部分包含磁链的字符串
+    def animation_magnet_str(cls, content):
+        # 提取一部分包含磁链的字符串
         regex_pre_magnet = re.compile("<!-- MetaSlider -->[\s\S]*<!-- MetaSlider -->")
         result_pre = regex_pre_magnet.findall(content)
         if len(result_pre) < 1 :
-            return []
+            return ''
         else:
-            pre_str = result_pre[0]
+            return result_pre[0]
 
-            # 从预先提取的字符串中取得磁链
-            regex_magnet = re.compile("[\da-zA-Z]{30,}")
-            result = regex_magnet.findall(pre_str)
+    # 动画页提取熟磁链
+    @classmethod
+    def animation_cook_magnet(cls,content):
+        # 从预先提取的字符串中取得磁链
+        regex_magnet = re.compile("(?<=熟)[\da-zA-Z]{30,}")
+        result = regex_magnet.findall(content)
+        return result
 
-            return result
+    # 动画页提取生磁链
+    @classmethod
+    def animation_fresh_magnet(cls, content):
+        # 从预先提取的字符串中取得磁链
+        regex_magnet = re.compile("(?<=生)[\da-zA-Z]{30,}")
+        result = regex_magnet.findall(content)
+        return result
+
+    # 动画页提取其他磁链
+    @classmethod
+    def animation_other_magnet(cls, content):
+        # 从预先提取的字符串中取得磁链
+        regex_magnet = re.compile("(?<=[>\n])[\da-zA-Z]{30,}")
+        result = regex_magnet.findall(content)
+        return result
