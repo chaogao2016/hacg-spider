@@ -158,3 +158,7 @@ class Spider(object):
         print("程序终止")
         exit()
 
+    # 修复操作
+    def fix(self):
+        print('这里是修复操作')
+
