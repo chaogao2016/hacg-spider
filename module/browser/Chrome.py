@@ -34,6 +34,7 @@ class Chrome(object):
         self.driver.get(url)
         time.sleep(1)
         full_document = self.driver.find_element_by_xpath('//*').get_attribute("outerHTML")
+        self.close_browser()
         return full_document
 
     # 关闭浏览器
