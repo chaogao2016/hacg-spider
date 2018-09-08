@@ -97,7 +97,7 @@ class Regex(object):
     @classmethod
     def animation_other_magnet(cls, content):
         # 从预先提取的字符串中取得磁链
-        regex_magnet = re.compile("(?<=[>\n\s、])[\da-zA-Z]{30,}|(?<=[>\n])[\da-zA-Z]{10,}[\u2E80-\u9FFF\s\n]*[\da-zA-Z]{10,}")
+        regex_magnet = re.compile("(?<=[>\n\s、])[\da-zA-Z]{30,}|(?<=[>\n\s])[\da-zA-Z]{15,}[\u2E80-\u9FFF\s\n]*[\da-zA-Z]{15,}")
         result = regex_magnet.findall(content)
         return cls.magnet_filter(result)
 

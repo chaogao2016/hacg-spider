@@ -12,6 +12,8 @@ class Db(object):
     def __init__(self):
         # 初始化数据库链接
         self._db = pymysql.connect(mysql.DB_HOST,mysql.DB_USER,mysql.DB_PASSWORD,mysql.DB_NAME)
+        # 表名
+        self._animation_table_name = "base_info"
 
     # 获取实例
     @classmethod
@@ -22,20 +24,32 @@ class Db(object):
         return cls._instance
 
     # 存储爬虫基本数据
-    def save_base_info(self,data):
+    def save_animation_base_info(self,data):
         # 使用 cursor() 方法创建一个游标对象 cursor
         cursor = self._db.cursor()
         now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         # 使用 execute()  方法执行 SQL 查询
-        sql = 'INSERT INTO base_info(title,`desc`,image,cook_magnet,fresh_magnet,other_magnet,c_t,u_t,base_url) values(\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\',\'{}\')'.format(data['title'],data['desc'],data['image'],data['cook_magnet'],data['fresh_magnet'],data['other_magnet'],now_time,now_time,data['base_url'])
+        field_list = []
+        value_list = []
+        format_list = []
+        for key,val in data.items() :
+            field_list.append(key)
+            value_list.append(val)
+            format_list.append('\'{}\'')
+        field_list.extend(['c_t','u_t'])
+        value_list.extend([now_time,now_time])
+        format_list.extend(['\'{}\'','\'{}\''])
+
+        sql = 'INSERT INTO ' + self._animation_table_name + '(' + ','.join(field_list) + ')' + ' values(' + ','.join(format_list) + ')'
+        sql.format(value_list)
         print(sql)
         cursor.execute(sql)
         self._db.commit()
 
     # 获取所有未爬成功的数据
-    def get_all_fail_data(self):
+    def get_animation_all_fail_data(self):
         cursor = self._db.cursor()
-        sql = "SELECT * FROM `base_info` WHERE cook_magnet = '[]' AND fresh_magnet = '[]' AND other_magnet = '[]';"
+        sql = "SELECT * FROM `" + self._animation_table_name + "` WHERE cook_magnet = '[]' AND fresh_magnet = '[]' AND other_magnet = '[]';"
 
         # 执行SQL语句
         cursor.execute(sql)
@@ -44,13 +58,24 @@ class Db(object):
         return results
 
     # 更新未爬成功的数据
-    def update_base_info(self,data):
+    def update_animation_base_info(self,data):
         # 使用 cursor() 方法创建一个游标对象 cursor
         cursor = self._db.cursor()
         now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         # 使用 execute()  方法执行 SQL 查询
-        sql = 'UPDATE base_info SET cook_magnet=\'{}\',fresh_magnet=\'{}\',other_magnet=\'{}\',u_t=\'{}\' WHERE id = ={}'.format(
+        sql = 'UPDATE ' + self._animation_table_name + ' SET cook_magnet=\'{}\',fresh_magnet=\'{}\',other_magnet=\'{}\',u_t=\'{}\' WHERE id = ={}'.format(
             data['cook_magnet'], data['fresh_magnet'], data['other_magnet'],now_time,data['id'])
+        print(sql)
+        cursor.execute(sql)
+        self._db.commit()
+
+    # 清空表，并重置他的自增计数器
+    def clear_animation_base_info(self):
+        # 使用 cursor() 方法创建一个游标对象 cursor
+        cursor = self._db.cursor()
+
+        # 使用 execute()  方法执行 SQL 查询
+        sql = 'truncate table ' + self._animation_table_name + ';'
         print(sql)
         cursor.execute(sql)
         self._db.commit()

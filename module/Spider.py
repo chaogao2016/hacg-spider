@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import time
 import json
+import hashlib
 import config.constant as constant
 import module.browser.Chrome as Chrome
 from module.browser.Chrome import Chrome
@@ -70,7 +71,10 @@ class Spider(object):
             return 0
         else:
             if self.animationPageSize == 0:
-                print("动画页第一次抓取，先初始化分页数据")
+                print("动画页第一次抓取")
+                print("清空数据表")
+                Storage.clear_animation_base_info()
+                print("初始化分页数据")
                 first_animation_url = self.animationUrl + '/page/' + str(self.curAnimationPage)
                 first_animation_page_content = Chrome.instance().get_common_document(first_animation_url)
                 # 抓取动画页最后一页id
@@ -126,16 +130,17 @@ class Spider(object):
                     # 组装数据
                     data_map = {
                         "title" : result_title,
-                        "desc" : result_desc,
+                        "describe" : result_desc,
                         "image" : json.dumps(result_image),
                         "cook_magnet" : json.dumps(cook_magnet),
                         "fresh_magnet": json.dumps(fresh_magnet),
                         "other_magnet": json.dumps(other_magnet),
-                        "base_url" : sub_link
+                        "base_url" : sub_link,
+                        "base_url_md5" : hashlib.md5(sub_link)
                     }
 
                     #存储数据
-                    Storage.save_base_info(data_map)
+                    Storage.save_animation_base_info(data_map)
 
                     print("==================================================")
                     time.sleep(1)
@@ -162,7 +167,7 @@ class Spider(object):
     # 修复操作
     @classmethod
     def fix(cls):
-        fail_data_list = Storage.get_all_fail_data()
+        fail_data_list = Storage.get_animation_all_fail_data()
 
         for fail_data_item in fail_data_list :
             sub_link = fail_data_item['base_url']
@@ -190,7 +195,7 @@ class Spider(object):
             }
 
             # 存储数据
-            Storage.update_base_info(data_map)
+            Storage.update_animation_base_info(data_map)
 
         print(fail_data_list)
         print('修复操作完成')

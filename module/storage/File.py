@@ -17,5 +17,5 @@ class File(object):
         return cls._instance
 
     # 存储爬虫基本数据
-    def save_base_info(self,data):
+    def save_animation_base_info(self,data):
         pass
