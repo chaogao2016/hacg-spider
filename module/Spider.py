@@ -3,6 +3,7 @@
 import time
 import json
 import hashlib
+import os
 import config.constant as constant
 import module.browser.Chrome as Chrome
 from module.browser.Chrome import Chrome
@@ -165,8 +166,7 @@ class Spider(object):
         exit()
 
     # 修复操作
-    @classmethod
-    def fix(cls):
+    def fix(self):
         fail_data_list = Storage.get_animation_all_fail_data()
 
         for fail_data_item in fail_data_list :
@@ -199,4 +199,9 @@ class Spider(object):
 
         print(fail_data_list)
         print('修复操作完成')
+
+    # 停止操作
+    def stop(self):
+        os.system("ps -ef|grep start.py|grep -v grep|awk '{print $2}'|xargs kill -9 ")
+
 
