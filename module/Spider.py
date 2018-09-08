@@ -137,7 +137,9 @@ class Spider(object):
                         "fresh_magnet": json.dumps(fresh_magnet),
                         "other_magnet": json.dumps(other_magnet),
                         "base_url" : sub_link,
-                        "base_url_md5" : hashlib.md5(sub_link.encode("gb2312")).hexdigest()
+                        "base_url_md5" : hashlib.md5(sub_link.encode("GBK")).hexdigest(),
+                        'title_md5' : hashlib.md5(result_title.encode("GBK")).hexdigest(),
+                        'describe_md5' : hashlib.md5(result_desc.encode("GBK")).hexdigest(),
                     }
 
                     #存储数据

@@ -22,7 +22,7 @@ if len(sys.argv) > 1 :
         print('您输入的命令不合法')
 
 else :
-    print("\n请附加命令")
+    print("请附加命令")
     print("start:启动脚本")
     print("stop:停止脚本")
     print("fix:修复脚本")
