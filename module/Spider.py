@@ -130,13 +130,13 @@ class Spider(object):
                     # 组装数据
                     data_map = {
                         "title" : result_title,
-                        "describe" : result_desc,
+                        "`describe`" : result_desc,
                         "image" : json.dumps(result_image),
                         "cook_magnet" : json.dumps(cook_magnet),
                         "fresh_magnet": json.dumps(fresh_magnet),
                         "other_magnet": json.dumps(other_magnet),
                         "base_url" : sub_link,
-                        "base_url_md5" : hashlib.md5(sub_link.encode("gb2312"))
+                        "base_url_md5" : hashlib.md5(sub_link.encode("gb2312")).hexdigest()
                     }
 
                     #存储数据

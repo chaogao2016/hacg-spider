@@ -31,17 +31,13 @@ class Db(object):
         # 使用 execute()  方法执行 SQL 查询
         field_list = []
         value_list = []
-        format_list = []
         for key,val in data.items() :
             field_list.append(key)
-            value_list.append(val)
-            format_list.append('\'{}\'')
+            value_list.append('\'' + val + '\'')
         field_list.extend(['c_t','u_t'])
-        value_list.extend([now_time,now_time])
-        format_list.extend(['\'{}\'','\'{}\''])
+        value_list.extend(['\'' + now_time + '\'','\'' + now_time + '\''])
 
-        sql = 'INSERT INTO ' + self._animation_table_name + '(' + ','.join(field_list) + ')' + ' values(' + ','.join(format_list) + ')'
-        sql.format(value_list)
+        sql = 'INSERT INTO ' + self._animation_table_name + '(' + ','.join(field_list) + ')' + ' values(' + ','.join(value_list) + ')'
         print(sql)
         cursor.execute(sql)
         self._db.commit()
