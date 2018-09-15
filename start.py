@@ -15,6 +15,9 @@ if len(sys.argv) > 1 :
     elif 'fix' in sys.argv:
         # 执行爬虫修复操作
         Spider.instance().fix()
+    elif 'update' in sys.argv :
+        # 执行爬虫更新操作
+        Spider.instance().update()
     elif 'test' in sys.argv:
         #测试模式
         pass

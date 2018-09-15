@@ -8,47 +8,41 @@ from module.storage.Db import Db
 
 class Storage(object):
 
+    # 获取实例
+    @classmethod
+    def instance(cls):
+        if not hasattr(Storage, "_instance"):
+            cls._instance = Storage()
+
+        return cls._instance
+
     # 构造方法
     def __init__(self):
-        pass
+        if app.STORAGE_DRIVER == 1 :
+            self.storage_instance = File.instance()
+        elif app.STORAGE_DRIVER == 2 :
+            self.storage_instance = Db.instance()
+        else:
+            print("请选择正确的存储驱动")
 
     # 存储爬虫基本数据
-    @classmethod
-    def save_animation_base_info(cls,data):
-        if app.STORAGE_DRIVER == 1 :
-            File.instance().save_animation_base_info(data)
-        elif app.STORAGE_DRIVER == 2 :
-            Db.instance().save_animation_base_info(data)
-        elif app.STORAGE_DRIVER == 3 :
-            File.instance().save_animation_base_info(data)
-            Db.instance().save_animation_base_info(data)
+    def save_animation_base_info(self,data):
+        self.storage_instance.save_animation_base_info(data)
 
     # 获取爬失败的数据
-    @classmethod
-    def get_animation_all_fail_data(cls):
-        if app.STORAGE_DRIVER == 1 :
-            print('文件驱动暂不支持此操作')
-        elif app.STORAGE_DRIVER == 2 :
-            return Db.instance().get_animation_all_fail_data()
-        elif app.STORAGE_DRIVER == 3 :
-            print('文件驱动暂不支持此操作')
+    def get_animation_all_fail_data(self):
+        self.storage_instance.get_animation_all_fail_data()
 
     # 修改爬失败的数据
-    @classmethod
-    def update_animation_base_info(cls,data):
-        if app.STORAGE_DRIVER == 1 :
-            print('文件驱动暂不支持此操作')
-        elif app.STORAGE_DRIVER == 2 :
-            return Db.instance().update_animation_base_info(data)
-        elif app.STORAGE_DRIVER == 3 :
-            print('文件驱动暂不支持此操作')
+    def fix_animation_base_info(self,data):
+        return self.instance().fix_animation_base_info(data)
 
     # 清空失败的数据
-    @classmethod
-    def clear_animation_base_info(cls):
-        if app.STORAGE_DRIVER == 1 :
-            print('文件驱动暂不支持此操作')
-        elif app.STORAGE_DRIVER == 2 :
-            return Db.instance().clear_animation_base_info()
-        elif app.STORAGE_DRIVER == 3 :
-            print('文件驱动暂不支持此操作')
+    def clear_animation_base_info(self):
+        return self.instance().clear_animation_base_info()
+
+    # 更新最新的数据
+    def update_animation_base_info(self, data):
+        # 先根据base_url的散列值查出记录
+        record = self.storage_instance.get_animation_by_base_url(data['base_url_md5'])
+        print(record)

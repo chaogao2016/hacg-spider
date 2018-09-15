@@ -25,6 +25,8 @@ class Spider(object):
         self.curAnimationPage = 1
         # 动画总页数
         self.animationPageSize = 0
+        # 更新时抓取总页数
+        self.updatePageSize = 3
 
     # 单例模式
     @classmethod
@@ -66,7 +68,7 @@ class Spider(object):
             print(self.comicUrl)
 
     # 动画页动作
-    def animation_action(self):
+    def animation_action(self,action = 'create'):
         if self.animationPageSize != 0 and (self.curAnimationPage > self.animationPageSize):
             print('动画页数据抓取完毕')
             return 0
@@ -74,7 +76,7 @@ class Spider(object):
             if self.animationPageSize == 0:
                 print("动画页第一次抓取")
                 print("清空数据表")
-                Storage.clear_animation_base_info()
+                Storage.instance().clear_animation_base_info()
                 print("初始化分页数据")
                 first_animation_url = self.animationUrl + '/page/' + str(self.curAnimationPage)
                 first_animation_page_content = Chrome.instance().get_common_document(first_animation_url)
@@ -143,7 +145,10 @@ class Spider(object):
                     }
 
                     #存储数据
-                    Storage.save_animation_base_info(data_map)
+                    if action == 'create':
+                        Storage.instance().save_animation_base_info(data_map)
+                    elif action == 'update':
+                        Storage.instance().update_animation_base_info(data_map)
 
                     print("==================================================")
                     time.sleep(1)
@@ -169,7 +174,7 @@ class Spider(object):
 
     # 修复操作
     def fix(self):
-        fail_data_list = Storage.get_animation_all_fail_data()
+        fail_data_list = Storage.instance().get_animation_all_fail_data()
 
         for fail_data_item in fail_data_list :
             sub_link = fail_data_item['base_url']
@@ -197,7 +202,7 @@ class Spider(object):
             }
 
             # 存储数据
-            Storage.update_animation_base_info(data_map)
+            Storage.instance().fix_animation_base_info(data_map)
 
         print(fail_data_list)
         print('修复操作完成')
@@ -205,5 +210,25 @@ class Spider(object):
     # 停止操作
     def stop(self):
         os.system("ps -ef|grep start.py|grep -v grep|awk '{print $2}'|xargs kill -9 ")
+
+    # 更新操作
+    def update(self):
+        # 爬取前几页数据，对比每一条url的md5，如果数据库中不存在，则将其插入数据库
+        # 如果已经存在，对比其他的md5，只要有变化，就重新抓取数据
+        self.animationPageSize = self.updatePageSize
+        while self.check_status() :
+            self.home_action()
+
+            self.animation_action('update')
+
+            print('大循环终止三秒')
+            time.sleep(constant.SLEEP_DELAY)
+
+        Chrome.instance().close_browser()
+        print("程序终止")
+        exit()
+
+
+
 
 

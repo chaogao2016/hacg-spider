@@ -54,7 +54,7 @@ class Db(object):
         return results
 
     # 更新未爬成功的数据
-    def update_animation_base_info(self,data):
+    def fix_animation_base_info(self,data):
         # 使用 cursor() 方法创建一个游标对象 cursor
         cursor = self._db.cursor()
         now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
@@ -75,6 +75,17 @@ class Db(object):
         print(sql)
         cursor.execute(sql)
         self._db.commit()
+
+    # 根据base_url的散列值查出记录
+    def get_animation_by_base_url(self,base_url_md5):
+        cursor = self._db.cursor()
+        sql = "SELECT * FROM `" + self._animation_table_name + "` WHERE base_url_md5 = '" + base_url_md5 + "';"
+
+        # 执行SQL语句
+        cursor.execute(sql)
+        # 获取所有记录列表
+        results = cursor.fetchone()
+        return results
 
     # 析构函数
     def __del__(self):
