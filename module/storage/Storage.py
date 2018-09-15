@@ -45,4 +45,5 @@ class Storage(object):
     def update_animation_base_info(self, data):
         # 先根据base_url的散列值查出记录
         record = self.storage_instance.get_animation_by_base_url(data['base_url_md5'])
-        print(record)
+        if record :
+            print(record['title'])
