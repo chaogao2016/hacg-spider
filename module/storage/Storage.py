@@ -35,15 +35,23 @@ class Storage(object):
 
     # 修改爬失败的数据
     def fix_animation_base_info(self,data):
-        return self.instance().fix_animation_base_info(data)
+        return self.storage_instance.instance().fix_animation_base_info(data)
 
     # 清空失败的数据
     def clear_animation_base_info(self):
-        return self.instance().clear_animation_base_info()
+        return self.storage_instance.instance().clear_animation_base_info()
 
     # 更新最新的数据
     def update_animation_base_info(self, data):
         # 先根据base_url的散列值查出记录
         record = self.storage_instance.get_animation_by_base_url(data['base_url_md5'])
         if record :
-            print(record['title'])
+            if data['title_md5'] != record['title_md5'] or data['describe_md5'] != record['describe_md5'] :
+                print('有更新')
+                data['id'] = record['id']
+                self.fix_animation_base_info(data)
+            else:
+                print('无更新')
+        else:
+            print('新插入')
+            self.save_animation_base_info(data)

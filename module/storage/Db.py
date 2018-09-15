@@ -44,7 +44,7 @@ class Db(object):
 
     # 获取所有未爬成功的数据
     def get_animation_all_fail_data(self):
-        cursor = self._db.cursor()
+        cursor = self._db.cursor(cursor=pymysql.cursors.DictCursor)
         sql = "SELECT * FROM `" + self._animation_table_name + "` WHERE cook_magnet = '[]' AND fresh_magnet = '[]' AND other_magnet = '[]';"
 
         # 执行SQL语句
@@ -59,9 +59,9 @@ class Db(object):
         cursor = self._db.cursor()
         now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         # 使用 execute()  方法执行 SQL 查询
-        sql = 'UPDATE ' + self._animation_table_name + ' SET cook_magnet=\'{}\',fresh_magnet=\'{}\',other_magnet=\'{}\',u_t=\'{}\' WHERE id = ={}'.format(
-            data['cook_magnet'], data['fresh_magnet'], data['other_magnet'],now_time,data['id'])
-        print(sql)
+        sql = 'UPDATE ' + self._animation_table_name + ' SET title=\'{}\',`describe`=\'{}\',title_md5=\'{}\',describe_md5=\'{}\',cook_magnet=\'{}\',fresh_magnet=\'{}\',other_magnet=\'{}\',u_t=\'{}\' WHERE id ={}'.format(
+            data['title'],data['`describe`'],data['title_md5'],data['describe_md5'],data['cook_magnet'], data['fresh_magnet'], data['other_magnet'],now_time,data['id'])
+        # print(sql)
         cursor.execute(sql)
         self._db.commit()
 
@@ -72,15 +72,15 @@ class Db(object):
 
         # 使用 execute()  方法执行 SQL 查询
         sql = 'truncate table ' + self._animation_table_name + ';'
-        print(sql)
+        # print(sql)
         cursor.execute(sql)
         self._db.commit()
 
     # 根据base_url的散列值查出记录
     def get_animation_by_base_url(self,base_url_md5):
-        cursor = self._db.cursor()
+        cursor = self._db.cursor(cursor=pymysql.cursors.DictCursor)
         sql = "SELECT * FROM `" + self._animation_table_name + "` WHERE base_url_md5 = '" + base_url_md5 + "';"
-
+        # print(sql)
         # 执行SQL语句
         cursor.execute(sql)
         # 获取所有记录列表

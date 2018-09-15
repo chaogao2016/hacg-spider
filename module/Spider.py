@@ -35,12 +35,12 @@ class Spider(object):
             Spider._instance = Spider()
         return Spider._instance
 
-    # 检查爬虫状态，若已到最后一页，返回false
-    def check_status(self):
-        if self.animationPageSize != 0 and (self.curAnimationPage > self.animationPageSize):
-            return False
-        else:
+    # 检查爬虫状态，若已到最后一页，返回true
+    def animation_is_finally(self):
+        if self.animationPageSize != 0 and (self.curAnimationPage > self.animationPageSize or self.curAnimationPage <= 0):
             return True
+        else:
+            return False
 
     # 首页动作
     def home_action(self):
@@ -67,100 +67,110 @@ class Spider(object):
             print(self.gameUrl)
             print(self.comicUrl)
 
+    # 动画页详细
+    def animation_detail(self,page,action):
+        print('开始第' + str(page) + '页动画页数据抓取')
+        current_animation_url = self.animationUrl + '/page/' + str(page)
+        animation_page_content = Chrome.instance().get_common_document(current_animation_url)
+        # 抓取当前页面子链接正则
+        result_sub_link = Regex.animation_sub_link(animation_page_content)
+        # 遍历当前分页链接，访问并抓取具体内容
+        for sub_link in result_sub_link:
+            print(sub_link)
+            if sub_link.find('all/game') != -1:
+                print('过滤掉游戏')
+                continue
+            animation_detail = Chrome.instance().get_common_document(sub_link)
+            # 抓取页面标题
+            result_title = Regex.animation_title(animation_detail)
+            if result_title.find('预告') != -1:
+                print('过滤掉预告')
+                continue
+            print('标题：' + str(result_title))
+            # 抓取页面描述
+            result_desc = Regex.animation_desc(animation_detail)
+            print('描述：' + str(result_desc))
+            # 抓取页面图片
+            result_image = Regex.animation_image(animation_detail)
+            print('图片：' + str(result_image))
+            # 抓取磁链
+            magnet_str = Regex.animation_magnet_str(animation_detail)
+            # 熟肉
+            cook_magnet = Regex.animation_cook_magnet(magnet_str)
+            print('熟肉磁链：' + str(cook_magnet))
+            # 生肉
+            fresh_magnet = Regex.animation_fresh_magnet(magnet_str)
+            print('生肉磁链：' + str(fresh_magnet))
+            # 其他磁链
+            other_magnet = Regex.animation_other_magnet(magnet_str)
+            print('其他磁链：' + str(other_magnet))
+            # 组装数据
+            data_map = {
+                "title": result_title,
+                "`describe`": result_desc,
+                "image": json.dumps(result_image),
+                "cook_magnet": json.dumps(cook_magnet),
+                "fresh_magnet": json.dumps(fresh_magnet),
+                "other_magnet": json.dumps(other_magnet),
+                "base_url": sub_link,
+                "base_url_md5": hashlib.md5(sub_link.encode("utf-8")).hexdigest(),
+                'title_md5': hashlib.md5(result_title.encode("utf-8")).hexdigest(),
+                'describe_md5': hashlib.md5(result_desc.encode("utf-8")).hexdigest(),
+            }
+            if action == 'create' :
+                Storage.instance().save_animation_base_info(data_map)
+            elif action == 'update' :
+                Storage.instance().update_animation_base_info(data_map)
+
     # 动画页动作
     def animation_action(self,action = 'create'):
-        if self.animationPageSize != 0 and (self.curAnimationPage > self.animationPageSize):
+        if self.animation_is_finally():
             print('动画页数据抓取完毕')
             return 0
         else:
-            if self.animationPageSize == 0:
-                print("动画页第一次抓取")
-                print("清空数据表")
-                Storage.instance().clear_animation_base_info()
-                print("初始化分页数据")
-                first_animation_url = self.animationUrl + '/page/' + str(self.curAnimationPage)
-                first_animation_page_content = Chrome.instance().get_common_document(first_animation_url)
-                # 抓取动画页最后一页id
-                result_last_page = Regex.animation_page_size(first_animation_page_content)
-                print(result_last_page)
-                if len(result_last_page) < 1 or int(result_last_page[0]) <= 0 :
-                    print("未抓到动画尾页，失败")
-                    return -1
-                else:
-                    print('共有' + str(result_last_page) + '页动画')
-                    self.animationPageSize = int(result_last_page[0])
-
             # 遍历分页，抓取动画数据
-            start_index = self.curAnimationPage
-            for page_id in range(start_index,self.animationPageSize + 1) :
-                print('开始第' + str(self.curAnimationPage) + '页动画页数据抓取')
-                current_animation_url = self.animationUrl + '/page/' + str(self.curAnimationPage)
-                animation_page_content = Chrome.instance().get_common_document(current_animation_url)
-                # 抓取当前页面子链接正则
-                result_sub_link = Regex.animation_sub_link(animation_page_content)
-                # 遍历当前分页链接，访问并抓取具体内容
-                for sub_link in result_sub_link :
-                    print(sub_link)
-                    if sub_link.find('all/game') != -1:
-                        print('过滤掉游戏')
-                        print("==================================================")
-                        continue
-                    animation_detail = Chrome.instance().get_common_document(sub_link)
-                    # 抓取页面标题
-                    result_title = Regex.animation_title(animation_detail)
-                    if result_title.find('预告') != -1 :
-                        print('过滤掉预告')
-                        print("==================================================")
-                        continue
-                    print('标题：' + str(result_title))
-                    # 抓取页面描述
-                    result_desc = Regex.animation_desc(animation_detail)
-                    print('描述：' + str(result_desc))
-                    # 抓取页面图片
-                    result_image = Regex.animation_image(animation_detail)
-                    print('图片：' + str(result_image))
-                    # 抓取磁链
-                    magnet_str = Regex.animation_magnet_str(animation_detail)
-                    # 熟肉
-                    cook_magnet = Regex.animation_cook_magnet(magnet_str)
-                    print('熟肉磁链：' + str(cook_magnet))
-                    # 生肉
-                    fresh_magnet = Regex.animation_fresh_magnet(magnet_str)
-                    print('生肉磁链：' + str(fresh_magnet))
-                    # 其他磁链
-                    other_magnet = Regex.animation_other_magnet(magnet_str)
-                    print('其他磁链：' + str(other_magnet))
-                    # 组装数据
-                    data_map = {
-                        "title" : result_title,
-                        "`describe`" : result_desc,
-                        "image" : json.dumps(result_image),
-                        "cook_magnet" : json.dumps(cook_magnet),
-                        "fresh_magnet": json.dumps(fresh_magnet),
-                        "other_magnet": json.dumps(other_magnet),
-                        "base_url" : sub_link,
-                        "base_url_md5" : hashlib.md5(sub_link.encode("utf-8")).hexdigest(),
-                        'title_md5' : hashlib.md5(result_title.encode("utf-8")).hexdigest(),
-                        'describe_md5' : hashlib.md5(result_desc.encode("utf-8")).hexdigest(),
-                    }
+            if action == 'create':
+                if self.animationPageSize == 0:
+                    print("动画页第一次抓取")
+                    print("清空数据表")
+                    Storage.instance().clear_animation_base_info()
+                    print("初始化分页数据")
+                    first_animation_url = self.animationUrl + '/page/' + str(self.curAnimationPage)
+                    first_animation_page_content = Chrome.instance().get_common_document(first_animation_url)
+                    # 抓取动画页最后一页id
+                    result_last_page = Regex.animation_page_size(first_animation_page_content)
+                    print(result_last_page)
+                    if len(result_last_page) < 1 or int(result_last_page[0]) <= 0:
+                        print("未抓到动画尾页，失败")
+                        return -1
+                    else:
+                        print('共有' + str(result_last_page) + '页动画')
+                        self.animationPageSize = int(result_last_page[0])
+                        self.curAnimationPage = self.animationPageSize
 
-                    #存储数据
-                    if action == 'create':
-                        Storage.instance().save_animation_base_info(data_map)
-                    elif action == 'update':
-                        Storage.instance().update_animation_base_info(data_map)
-
+                for page_id in range(self.animationPageSize, 0,-1):
                     print("==================================================")
+                    self.animation_detail(page_id,action)
+                    print("==================================================")
+                    self.curAnimationPage -= 1
                     time.sleep(1)
-
-                self.curAnimationPage += 1
-                print('动画循环终止三秒')
-                time.sleep(constant.SLEEP_DELAY)
+                    print('动画循环终止三秒')
+                    time.sleep(constant.SLEEP_DELAY)
+            elif action == 'update':
+                start_index = self.curAnimationPage
+                for page_id in range(start_index, self.animationPageSize + 1):
+                    print("==================================================")
+                    self.animation_detail(page_id,action)
+                    print("==================================================")
+                    self.curAnimationPage += 1
+                    time.sleep(1)
+                    print('动画循环终止三秒')
+                    time.sleep(constant.SLEEP_DELAY)
 
     # 程序启动
     def run(self):
 
-        while self.check_status() :
+        while not self.animation_is_finally() :
             self.home_action()
 
             self.animation_action()
@@ -216,7 +226,7 @@ class Spider(object):
         # 爬取前几页数据，对比每一条url的md5，如果数据库中不存在，则将其插入数据库
         # 如果已经存在，对比其他的md5，只要有变化，就重新抓取数据
         self.animationPageSize = self.updatePageSize
-        while self.check_status() :
+        while not self.animation_is_finally() :
             self.home_action()
 
             self.animation_action('update')
