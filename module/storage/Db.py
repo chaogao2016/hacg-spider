@@ -12,7 +12,6 @@ class Db(object):
     def __init__(self):
         # 初始化数据库链接
         self._db = pymysql.connect(host=mysql.DB_HOST, port=mysql.DB_PORT, user=mysql.DB_USER, passwd=mysql.DB_PASSWORD, db=mysql.DB_NAME, charset=mysql.DB_CHRSET)
-        self._db = pymysql.connect(mysql.DB_HOST,mysql.DB_USER,mysql.DB_PASSWORD,mysql.DB_NAME)
         # 表名
         self._animation_table_name = "base_info"
 
