@@ -80,6 +80,9 @@ class Spider(object):
             if sub_link.find('all/game') != -1:
                 print('过滤掉游戏')
                 continue
+            if sub_link.find('all/anime/1375') != -1:
+                print("出错无法访问的页面")
+                continue
             animation_detail = Chrome.instance().get_common_document(sub_link)
             # 抓取页面标题
             result_title = Regex.animation_title(animation_detail)
@@ -113,8 +116,7 @@ class Spider(object):
             # 标签
             tags = Regex.animation_tag_str(animation_detail)
             print("该页被打上了：" + str(tags) + "标签")
-            if sub_link == "http://www.llss.lol/wp/all/anime/1375/" :
-                continue
+
             # 组装数据
             data_map = {
                 "title": result_title,
