@@ -113,7 +113,7 @@ class Spider(object):
             # 标签
             tags = Regex.animation_tag_str(animation_detail)
             print("该页被打上了：" + str(tags) + "标签")
-            if sub_link == "http://www.llss.lol/wp/all/anime/1375" :
+            if sub_link == "http://www.llss.lol/wp/all/anime/1375/" :
                 continue
             # 组装数据
             data_map = {
