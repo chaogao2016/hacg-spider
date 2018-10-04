@@ -33,7 +33,7 @@ class Db(object):
         value_list = []
         for key,val in data.items() :
             field_list.append(key)
-            value_list.append('\'' + val + '\'')
+            value_list.append('\'' + str(val) + '\'')
         field_list.extend(['c_t','u_t'])
         value_list.extend(['\'' + now_time + '\'','\'' + now_time + '\''])
 
