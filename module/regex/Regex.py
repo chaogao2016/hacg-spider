@@ -77,6 +77,37 @@ class Regex(object):
         else:
             return result_pre[0]
 
+    # 动画页提取评分
+    @classmethod
+    def animation_score_str(cls,content):
+        regex_score = re.compile("(?<=<center>[\s\S]*平均[\s\S]*strong>)[\s\S]*?(?=</strong>)")
+        result_score = regex_score.findall(content)
+        if len(result_score) < 1 :
+            return 0.00
+        else:
+            return result_score[0]
+
+    # 动画业提取评分人数
+    @classmethod
+    def animation_score_num_str(cls,content):
+        regex_score_num = re.compile("(?<=<center>[\s\S]*strong>)[\s\S]*?(?=</strong>[\s\S]*个评分)")
+        result_score_num = regex_score_num.findall(content)
+        if len(result_score_num) < 1:
+            return 0
+        else:
+            return result_score_num[0]
+
+    # 动画页提取tag
+    @classmethod
+    def animation_tag_str(cls,content):
+        regex_tag = re.compile("(?<=rel.*?\"tag\">).*?(?=</a)")
+        result_tag = regex_tag.findall(content)
+
+        if len(result_tag) < 1:
+            return ''
+        else:
+            return ",".join(str(item) for item in result_tag)
+
     # 动画页提取熟磁链
     @classmethod
     def animation_cook_magnet(cls,content):

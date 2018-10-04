@@ -59,8 +59,8 @@ class Db(object):
         cursor = self._db.cursor()
         now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         # 使用 execute()  方法执行 SQL 查询
-        sql = 'UPDATE ' + self._animation_table_name + ' SET title=\'{}\',`describe`=\'{}\',title_md5=\'{}\',describe_md5=\'{}\',cook_magnet=\'{}\',fresh_magnet=\'{}\',other_magnet=\'{}\',u_t=\'{}\' WHERE id ={}'.format(
-            data['title'],data['`describe`'],data['title_md5'],data['describe_md5'],data['cook_magnet'], data['fresh_magnet'], data['other_magnet'],now_time,data['id'])
+        sql = 'UPDATE ' + self._animation_table_name + ' SET score_num=\'{}\',score=\'{}\',title=\'{}\',des=\'{}\',title_md5=\'{}\',describe_md5=\'{}\',cook_magnet=\'{}\',fresh_magnet=\'{}\',other_magnet=\'{}\',u_t=\'{}\' WHERE id ={}'.format(
+            data['score_num'],data['score'],data['title'],data['des'],data['title_md5'],data['describe_md5'],data['cook_magnet'], data['fresh_magnet'], data['other_magnet'],now_time,data['id'])
         # print(sql)
         cursor.execute(sql)
         self._db.commit()

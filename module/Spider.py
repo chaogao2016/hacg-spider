@@ -104,15 +104,28 @@ class Spider(object):
             # 其他磁链
             other_magnet = Regex.animation_other_magnet(magnet_str)
             print('其他磁链：' + str(other_magnet))
+            # 评分
+            score = Regex.animation_score_str(animation_detail)
+            print('动画评分: ' + str(score))
+            # 评分人数
+            score_num = Regex.animation_score_num_str(animation_detail)
+            print("评分人数: " + str(score_num))
+            # 标签
+            tags = Regex.animation_tag_str(animation_detail)
+            print("该页被打上了：" + str(tags) + "标签")
+
             # 组装数据
             data_map = {
                 "title": result_title,
-                "`describe`": result_desc,
+                "des": result_desc,
                 "image": json.dumps(result_image),
                 "cook_magnet": json.dumps(cook_magnet),
                 "fresh_magnet": json.dumps(fresh_magnet),
                 "other_magnet": json.dumps(other_magnet),
                 "base_url": sub_link,
+                "tag" : tags,
+                "score" : score,
+                "score_num" : score_num,
                 "base_url_md5": hashlib.md5(sub_link.encode("utf-8")).hexdigest(),
                 'title_md5': hashlib.md5(result_title.encode("utf-8")).hexdigest(),
                 'describe_md5': hashlib.md5(result_desc.encode("utf-8")).hexdigest(),

@@ -46,7 +46,7 @@ class Storage(object):
         # 先根据base_url的散列值查出记录
         record = self.storage_instance.get_animation_by_base_url(data['base_url_md5'])
         if record :
-            if data['title_md5'] != record['title_md5'] or data['describe_md5'] != record['describe_md5'] :
+            if data['title_md5'] != record['title_md5'] or data['describe_md5'] != record['describe_md5'] or data['score'] != record['score'] :
                 print('有更新')
                 data['id'] = record['id']
                 self.fix_animation_base_info(data)
