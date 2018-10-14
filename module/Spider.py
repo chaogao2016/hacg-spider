@@ -254,6 +254,9 @@ class Spider(object):
         print("程序终止")
         exit()
 
+    # 下载
+    def download(self):
+        Storage.instance().down_from_queue()
 
 
 

@@ -41,6 +41,7 @@ class Db(object):
         print(sql)
         cursor.execute(sql)
         self._db.commit()
+        return cursor.lastrowid
 
     # 获取所有未爬成功的数据
     def get_animation_all_fail_data(self):
