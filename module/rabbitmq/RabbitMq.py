@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 __author__ = 'gaochao'
+import os
 import pika
 import json
+import config.filesystem as filesystem
+from module.storage.Db import Db
 
 class RabbitMq(object):
 
@@ -38,7 +41,34 @@ class RabbitMq(object):
     # 消费下载任务
     def pop_magnet_task(self):
         def callback(ch,method,properties,body):
-            print(body)
+            message = json.loads(body)
+            magnet_file_dir = filesystem.ANIMATION_STORAGE_PATH + str(message['id']) + "/"
+            magnet_file_path = magnet_file_dir + "/magnet.txt"
+
+            if os.path.exists(magnet_file_path):
+                if not os.path.exists(magnet_file_dir):
+                    os.mkdir(magnet_file_dir)
+
+                os.system("touch " + magnet_file_path)
+                Db.instance().update_store_dir(message['id'],magnet_file_dir)
+
+                # 下载图片
+                image_list = message['image']
+                for image_url in image_list:
+                    image_download_commend = "aria2c " + image_url + "-d " + magnet_file_dir
+                    os.system(image_download_commend)
+
+            # 将本次需要下载的任务写进magnet.txt，标记为未完成
+            magnet_list = message['magnet']
+            with open(magnet_file_path) as f_handle:
+                for magnet in magnet_list:
+                    f_handle.writelines(magnet + ",0")
+                    # 将任务投递给aria2c
+                    complete_hook_file = filesystem.ANIMATION_HOOK_PATH + "complete.sh"
+                    error_hook_file = filesystem.ANIMATION_HOOK_PATH + "error.sh"
+                    magnet_link = "magnet:?xt=urn:btih:" + magnet
+                    magnet_download_commend = "aria2c \"" + magnet_link + "\"" + "-d " + magnet_file_dir + " --on-download-complete " + complete_hook_file + " --on-download-error " + error_hook_file
+                    os.system(magnet_download_commend)
 
             ch.basic_ack(delivery_tag = method.delivery_tag)
 
@@ -48,6 +78,7 @@ class RabbitMq(object):
             callback,
             queue='magnet_download'
         )
+        self._channel.start_consuming()
 
     def __del__(self):
         self._connection.close()

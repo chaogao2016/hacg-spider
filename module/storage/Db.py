@@ -88,6 +88,17 @@ class Db(object):
         results = cursor.fetchone()
         return results
 
+    # 根据id更新文件路径字段
+    def update_store_dir(self,record_id,store_dir):
+        cursor = self._db.cursor()
+        now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        # 使用 execute()  方法执行 SQL 查询
+        sql = 'UPDATE ' + self._animation_table_name + ' SET store_dir=\'{}\',u_t=\'{}\' WHERE id ={}'.format(
+            store_dir, now_time, record_id)
+        # print(sql)
+        cursor.execute(sql)
+        self._db.commit()
+
     # 析构函数
     def __del__(self):
         self._db.close()

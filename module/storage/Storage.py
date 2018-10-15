@@ -68,7 +68,7 @@ class Storage(object):
     @classmethod
     def section_delivery(cls,store_dir,record_id,image,cook_magnet,fresh_magnet,other_magnet):
         magnet_list = []
-        file_path = store_dir + str(record_id) + "/magnet.txt"
+        file_path = store_dir + "/magnet.txt"
         if os.path.exists(file_path) :
             with open(file_path) as f_handle:
                 line = f_handle.readline()
