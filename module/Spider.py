@@ -26,7 +26,7 @@ class Spider(object):
         # 动画总页数
         self.animationPageSize = 0
         # 更新时抓取总页数
-        self.updatePageSize = 3
+        self.updatePageSize = 1
 
     # 单例模式
     @classmethod
@@ -257,7 +257,3 @@ class Spider(object):
     # 下载
     def download(self):
         Storage.instance().down_from_queue()
-
-
-
-
